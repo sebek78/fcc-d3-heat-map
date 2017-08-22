@@ -1,7 +1,7 @@
 const url ='https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/global-temperature.json';
 let data = [];
 
-let margin = {top: 40, right: 120, bottom: 60, left:60}
+let margin = {top: 80, right: 120, bottom: 60, left:60}
 let widthChart = 1300 - margin.left - margin.right;
 let heightChart = 460 - margin.top - margin.bottom;
 const chartHandler = document.getElementById("chart");
@@ -61,7 +61,7 @@ fetch(url)
                   if (temp < 2) { colorIndex = 0; }
                   else if (temp > 12 ) { colorIndex = 11;}
                   else if (temp >=2 && temp <=12) {
-                    colorIndex = Math.round(temp)-2; };
+                    colorIndex = Math.floor(temp)-2; };
                   let color = "rgb("+colors[colorIndex].r+","+
                                     colors[colorIndex].g+","+
                                     colors[colorIndex].b+")";
@@ -73,54 +73,55 @@ fetch(url)
         .attr("class", "axis")
         .attr("transform", "translate(0," + heightChart + ")")
         .call(xAxis);
-
       chart.append("g").attr("class", "axis").call(yAxis);
 
       chart.append('text').text('MONTHS')
                 .attr("class","axis-description")
                 .attr('x', -30)
-                .attr('y', 90)
-                .attr("transform", "rotate(-90 -30 90)");
+                .attr('y', 80)
+                .attr("transform", "rotate(-90 -30 80)");
 
-      chart.append('text').text('text')
+      chart.append('text').text('Source: https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/global-temperature.json')
                 .attr("class","source")
-                .attr('x', 130)
+                .attr('x', 0)
                 .attr('y', heightChart+50)
                 .attr('fill', 'black');
 
-      chart.append('text').text("X axis")
+      chart.append('text').text("YEARS")
                 .attr("class", "axis-description")
-                .attr('x', 900)
-                .attr('y', heightChart+40)
+                .attr('x', 1060)
+                .attr('y', heightChart+45)
                 .attr('fill', 'black');
-      chart.append('text').text("title")
+      chart.append('text').text("Visualize Data with a Heat Map")
                 .attr("class", "title")
                 .attr('x', 100)
-                .attr('y',-10)
+                .attr('y',-50)
                 .attr('fill', 'black');
-      /* key
-      chart.append('circle')
-          .attr("cy", 300)
-          .attr("cx", 1000)
-          .attr("r", 6)
-          .attr("fill", redPoint)
-      chart.append('text').text("DOPING")
-                .attr("class", "point-text")
-                .attr('x', 1020)
-                .attr('y', 300+5)
-                .attr('fill', 'black');
+      /* key */
 
-      chart.append('circle')
-          .attr("cy", 320)
-          .attr("cx", 1000)
-          .attr("r", 6)
-          .attr("fill", greenPoint)
-      chart.append('text').text("NO DOPING")
-                .attr("class", "point-text")
-                .attr('x', 1020)
-                .attr('y', 320+5)
-                .attr('fill', 'black');
-        */
+      for (let i=0; i<12;i++) {
+
+          chart.append('rect')
+              .attr("y", -60)
+              .attr("x", 600+(i*30))
+              .attr("width", 30)
+              .attr("height", 30)
+              .attr("fill", "rgb("+colors[i].r+","+
+                                colors[i].g+","+
+                                colors[i].b+")");
+
+          let text="";
+          if (i===0) { text="<3" }
+          else if (i > 0 && i <11) { text = (i+2).toString()}
+          else if (i===11) {text = "12+"};
+
+          chart.append('text').text(text)
+                    .attr("class", "point-text")
+                    .attr('x', 600+5+(i*30))
+                    .attr('y', -15)
+                    .attr('fill', 'black');
+        }
+
 /* signature
       chart.append('defs').append('path').attr('id','signature')
                         .attr('d','M550 350 L900 200')
