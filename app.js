@@ -1,4 +1,3 @@
-
 const url ='https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/global-temperature.json';
 let data = [];
 
@@ -9,6 +8,19 @@ const chartHandler = document.getElementById("chart");
 let wrapperBox = document.getElementById("wrapper");
 const monthName = ["January", "February", "March", "April",
   "May", "June", "July", "August", "September", "October", "November", "December"];
+const colors = [
+  {r: 32, g: 96, b: 255},
+  {r: 32, g: 159, b: 255},
+  {r: 0,  g:207, b: 255},
+  {r: 170, g: 255, b: 255},
+  {r: 255, g: 255, b: 84},
+  {r: 255, g: 240, b: 0},
+  {r: 255, g: 191, b: 0},
+  {r: 255, g: 168, b: 0},
+  {r: 255, g: 138, b: 0},
+  {r: 255, g: 112, b: 0},
+  {r: 255, g: 77, b: 0},
+  {r: 255, g: 0, b: 0} ];
 
 fetch(url)
   .then((resp)=> resp.json())
@@ -31,21 +43,30 @@ fetch(url)
       let rectangleHeight = heightChart/maxY;
       let rectangleWidth = widthChart/Math.ceil(data.monthlyVariance.length/12);
       const baseTemperature = data.baseTemperature;
-      console.log(baseTemperature);
 
 /* drawing */
       let rectangle = chart.selectAll("g")
           .data(data.monthlyVariance)
           .enter().append("g")
 
-          //console.log(data.monthlyVariance);
           rectangle.append("rect")
             .attr("y", function(d){ return y(parseInt(d.month)-1);})
             .attr("x", function(d){ return x(new Date(d.year,0));})
             .attr("height",rectangleHeight)
             .attr("width", rectangleWidth)
             .attr("id",function(d){ return data.monthlyVariance.indexOf(d)+1;})
-            .attr("fill", "red");
+            .attr("fill", function(d){
+                  let temp = (baseTemperature + d.variance).toFixed(2);
+                  let colorIndex;
+                  if (temp < 2) { colorIndex = 0; }
+                  else if (temp > 12 ) { colorIndex = 11;}
+                  else if (temp >=2 && temp <=12) {
+                    colorIndex = Math.round(temp)-2; };
+                  let color = "rgb("+colors[colorIndex].r+","+
+                                    colors[colorIndex].g+","+
+                                    colors[colorIndex].b+")";
+                  return color;
+              });
 
 /* axes description */
       chart.append("g")
@@ -128,10 +149,7 @@ fetch(url)
           tooltip.innerHTML =(
             data.monthlyVariance[ev].year + " " + month +"<br>"+
             ((baseTemperature + data.monthlyVariance[ev].variance).toFixed(2))+
-            "<br>"+data.monthlyVariance[ev].variance
-
-
-                    );
+            "<br>"+data.monthlyVariance[ev].variance);
           tooltip.style.top = top.toString()+"px";
           tooltip.style.left = left.toString()+"px";
           tooltip.style.zIndex= "2";
