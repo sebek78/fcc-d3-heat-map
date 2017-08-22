@@ -4,7 +4,7 @@ let data = [];
 
 let margin = {top: 40, right: 120, bottom: 60, left:60}
 let widthChart = 1300 - margin.left - margin.right;
-let heightChart = 620 - margin.top - margin.bottom;
+let heightChart = 460 - margin.top - margin.bottom;
 const chartHandler = document.getElementById("chart");
 let wrapperBox = document.getElementById("wrapper");
 
@@ -17,7 +17,6 @@ fetch(url)
       const minTime = new Date(data.monthlyVariance[0].year, data.monthlyVariance[0].month);
       const maxTime = new Date(data.monthlyVariance[data.monthlyVariance.length-1].year,
         data.monthlyVariance[data.monthlyVariance.length-1].month);
-      //console.log(minTime, maxTime);
       let maxY = 12; //months
       let y =  d3.scaleLinear().domain([0,maxY]).range([0, heightChart]);
       let x = d3.scaleTime().domain([minTime, maxTime]).range([0, widthChart]);
@@ -31,18 +30,22 @@ fetch(url)
       let xAxis = d3.axisBottom(x).tickFormat(d3.timeFormat("%Y"));
       let yAxis = d3.axisLeft(y);
 
+      let rectangleHeight = heightChart/maxY;
+      let rectangleWidth = widthChart/Math.ceil(data.monthlyVariance.length/12);
+
 /* drawing */
       let rectangle = chart.selectAll("g")
-          .data(data)
-          .enter().append("g");
+          .data(data.monthlyVariance)
+          .enter().append("g")
 
+          //console.log(data.monthlyVariance);
           rectangle.append("rect")
-          .attr("x",null)
-          .attr("y",null)
-          .attr("height", null)
-          .attr("width",null)
-          .attr("id",null);
-
+            .attr("y", function(d){ return y(parseInt(d.month)-1);})
+            .attr("x", function(d){ return x(new Date(d.year,0));})
+            .attr("height",rectangleHeight)
+            .attr("width", rectangleWidth)
+            .attr("id",function(d){ return data.monthlyVariance.indexOf(d);})
+            .attr("fill", "red");
 
 /* axes description */
       chart.append("g")
