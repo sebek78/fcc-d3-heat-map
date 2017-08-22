@@ -10,7 +10,7 @@
   margin: 0 auto;
   background-color: #CCC;
   position: relative;
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 .chart {
   background-color: #edf1f0;
@@ -46,7 +46,7 @@
   color: #000000;
   font-size: 16px;
   padding: 5px;
-  width: 200px;
+  /* width: 120px;*/
   border: 2px solid #000000;
   border-radius: 5px;
   padding: 10px;

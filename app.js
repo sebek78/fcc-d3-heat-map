@@ -7,7 +7,8 @@ let widthChart = 1300 - margin.left - margin.right;
 let heightChart = 460 - margin.top - margin.bottom;
 const chartHandler = document.getElementById("chart");
 let wrapperBox = document.getElementById("wrapper");
-
+const monthName = ["January", "February", "March", "April",
+  "May", "June", "July", "August", "September", "October", "November", "December"];
 
 fetch(url)
   .then((resp)=> resp.json())
@@ -20,18 +21,17 @@ fetch(url)
       let maxY = 12; //months
       let y =  d3.scaleLinear().domain([0,maxY]).range([0, heightChart]);
       let x = d3.scaleTime().domain([minTime, maxTime]).range([0, widthChart]);
-
       let chart = d3.select(".chart")
             .attr("width",widthChart+margin.left+margin.right)
             .attr("height",heightChart+margin.top+margin.bottom)
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
       let xAxis = d3.axisBottom(x).tickFormat(d3.timeFormat("%Y"));
       let yAxis = d3.axisLeft(y);
-
       let rectangleHeight = heightChart/maxY;
       let rectangleWidth = widthChart/Math.ceil(data.monthlyVariance.length/12);
+      const baseTemperature = data.baseTemperature;
+      console.log(baseTemperature);
 
 /* drawing */
       let rectangle = chart.selectAll("g")
@@ -44,7 +44,7 @@ fetch(url)
             .attr("x", function(d){ return x(new Date(d.year,0));})
             .attr("height",rectangleHeight)
             .attr("width", rectangleWidth)
-            .attr("id",function(d){ return data.monthlyVariance.indexOf(d);})
+            .attr("id",function(d){ return data.monthlyVariance.indexOf(d)+1;})
             .attr("fill", "red");
 
 /* axes description */
@@ -113,7 +113,7 @@ fetch(url)
                   .attr('y', 150)
                   .attr("class", "sign");
 */
-/* tooltip
+/* tooltip */
       let tooltip = document.createElement("div");
       tooltip.classList.add('tooltip');
       tooltip.setAttribute("id", "tooltip");
@@ -122,13 +122,16 @@ fetch(url)
       chartHandler.addEventListener("mouseover", function(event){
         let ev = parseInt(event.target.id)-1;
         if (!isNaN(ev)) {
-          let top = 100;
-          let left = 100;
+          let top = event.layerY-20;
+          let left = event.layerX+30;
+          let month = monthName[parseInt(data.monthlyVariance[ev].month)-1];
           tooltip.innerHTML =(
-            data[ev].Name+","+data[ev].Nationality+"<br>"+
-            "Year:"+data[ev].Year+", Time:"+data[ev].Time+"<br><br>"+
-            data[ev].Doping
-          );
+            data.monthlyVariance[ev].year + " " + month +"<br>"+
+            ((baseTemperature + data.monthlyVariance[ev].variance).toFixed(2))+
+            "<br>"+data.monthlyVariance[ev].variance
+
+
+                    );
           tooltip.style.top = top.toString()+"px";
           tooltip.style.left = left.toString()+"px";
           tooltip.style.zIndex= "2";
@@ -136,7 +139,7 @@ fetch(url)
           tooltip.style.zIndex= "-2";
         }
       }, false);
-*/
+
 })
   .catch(function(error){
     console.log(error);
