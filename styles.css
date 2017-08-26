@@ -16,17 +16,24 @@
   background-color: #edf1f0;
   display: block;
 }
-.point-text {
-  font-size: 14px;
-}
-.axis-description {
-  font-size:20px;
-}
-.axis text {
+.axis-x text, .axis-y text{
   font-size: 20px;
 }
-.axis line {
-  stroke: #000000;
+.axis-x path,.axis-x line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+.axis-y path, .axis-y line {
+  fill: none;
+  stroke: none;
+  shape-rendering: crispEdges;
+}
+.axis-x .area {
+  fill: red;
+}
+.axis-description {
+  font-size: 20px;
 }
 .title {
   font-size: 30px;
@@ -36,7 +43,6 @@
 }
 .sign {
   font-size: 20px;
-  stroke: none;
   fill: #d7c6b4;
 }
 .tooltip {
@@ -46,10 +52,8 @@
   color: #000000;
   font-size: 16px;
   padding: 5px;
-  /* width: 120px;*/
   border: 2px solid #000000;
   border-radius: 5px;
   padding: 10px;
   text-align: center;
-
 }

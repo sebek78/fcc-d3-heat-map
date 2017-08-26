@@ -1,9 +1,8 @@
 const url ='https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/global-temperature.json';
 let data = [];
-
-let margin = {top: 80, right: 120, bottom: 60, left:60}
+let margin = {top: 70, right: 80, bottom: 60, left:110}
 let widthChart = 1300 - margin.left - margin.right;
-let heightChart = 460 - margin.top - margin.bottom;
+let heightChart = 560 - margin.top - margin.bottom;
 const chartHandler = document.getElementById("chart");
 let wrapperBox = document.getElementById("wrapper");
 const monthName = ["January", "February", "March", "April",
@@ -21,7 +20,6 @@ const colors = [
   {r: 255, g: 112, b: 0},
   {r: 255, g: 77, b: 0},
   {r: 255, g: 0, b: 0} ];
-
 fetch(url)
   .then((resp)=> resp.json())
   .then(function(receivedData) {
@@ -31,7 +29,7 @@ fetch(url)
       const maxTime = new Date(data.monthlyVariance[data.monthlyVariance.length-1].year,
         data.monthlyVariance[data.monthlyVariance.length-1].month);
       let maxY = 12; //months
-      let y =  d3.scaleLinear().domain([0,maxY]).range([0, heightChart]);
+      let y =  d3.scaleBand().domain(monthName).rangeRound([0,heightChart]);
       let x = d3.scaleTime().domain([minTime, maxTime]).range([0, widthChart]);
       let chart = d3.select(".chart")
             .attr("width",widthChart+margin.left+margin.right)
@@ -43,14 +41,13 @@ fetch(url)
       let rectangleHeight = heightChart/maxY;
       let rectangleWidth = widthChart/Math.ceil(data.monthlyVariance.length/12);
       const baseTemperature = data.baseTemperature;
-
 /* drawing */
       let rectangle = chart.selectAll("g")
           .data(data.monthlyVariance)
           .enter().append("g")
 
           rectangle.append("rect")
-            .attr("y", function(d){ return y(parseInt(d.month)-1);})
+            .attr("y", function(d){ return y(monthName[parseInt((d.month)-1)]);})
             .attr("x", function(d){ return x(new Date(d.year,0));})
             .attr("height",rectangleHeight)
             .attr("width", rectangleWidth)
@@ -67,40 +64,33 @@ fetch(url)
                                     colors[colorIndex].b+")";
                   return color;
               });
-
 /* axes description */
       chart.append("g")
-        .attr("class", "axis")
+        .attr("class","axis-x")
         .attr("transform", "translate(0," + heightChart + ")")
         .call(xAxis);
-      chart.append("g").attr("class", "axis").call(yAxis);
-
+      chart.append("g").attr("class", "axis-y").call(yAxis);
       chart.append('text').text('MONTHS')
                 .attr("class","axis-description")
-                .attr('x', -30)
-                .attr('y', 80)
-                .attr("transform", "rotate(-90 -30 80)");
-
+                .attr('x', -90)
+                .attr('y', -10)
       chart.append('text').text('Source: https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/global-temperature.json')
                 .attr("class","source")
                 .attr('x', 0)
                 .attr('y', heightChart+50)
                 .attr('fill', 'black');
-
       chart.append('text').text("YEARS")
                 .attr("class", "axis-description")
                 .attr('x', 1060)
-                .attr('y', heightChart+45)
+                .attr('y', heightChart+50)
                 .attr('fill', 'black');
       chart.append('text').text("Visualize Data with a Heat Map")
                 .attr("class", "title")
                 .attr('x', 100)
-                .attr('y',-50)
+                .attr('y',-30)
                 .attr('fill', 'black');
       /* key */
-
       for (let i=0; i<12;i++) {
-
           chart.append('rect')
               .attr("y", -60)
               .attr("x", 600+(i*30))
@@ -109,38 +99,26 @@ fetch(url)
               .attr("fill", "rgb("+colors[i].r+","+
                                 colors[i].g+","+
                                 colors[i].b+")");
-
           let text="";
           if (i===0) { text="<3" }
           else if (i > 0 && i <11) { text = (i+2).toString()}
           else if (i===11) {text = "12+"};
-
           chart.append('text').text(text)
                     .attr("class", "point-text")
                     .attr('x', 600+5+(i*30))
                     .attr('y', -15)
                     .attr('fill', 'black');
         }
-
-/* signature
-      chart.append('defs').append('path').attr('id','signature')
-                        .attr('d','M550 350 L900 200')
-                        //.attr('stroke', 'black')
-                        .attr('fill','transparent');
-      chart.append('use').attr('xlink:href', '#signature');
-      chart.append('text')
-                    .append('textPath').attr('xlink:href','#signature')
-                        .text('created by Sebastian Sporek')
+/* signature */
+        chart.append('text').text('created by Sebastian Sporek')
                   .attr('x', 150)
-                  .attr('y', 150)
+                  .attr('y', -5)
                   .attr("class", "sign");
-*/
 /* tooltip */
       let tooltip = document.createElement("div");
       tooltip.classList.add('tooltip');
       tooltip.setAttribute("id", "tooltip");
       wrapperBox.appendChild(tooltip);
-
       chartHandler.addEventListener("mouseover", function(event){
         let ev = parseInt(event.target.id)-1;
         if (!isNaN(ev)) {
@@ -158,7 +136,6 @@ fetch(url)
           tooltip.style.zIndex= "-2";
         }
       }, false);
-
 })
   .catch(function(error){
     console.log(error);
